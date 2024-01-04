@@ -1,0 +1,63 @@
+/* body {
+    background-color: skyblue;
+    color: black;
+    display: flex;
+}
+
+.city-input {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.search-history {
+    width: 200px;
+    background-color: lightgray;
+    padding: 10px;
+    align-items: left;
+    display: flex; 
+    flex-direction: column;"
+}
+*/
+/*
+.card-body {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Media queries for different screen sizes */
+
+@media screen and (max-width: 768px) {
+    /* Styles for screens up to 768px wide */
+    body {
+        /* Update styles for smaller screens */
+    }
+}
+
+@media screen and (min-width: 769px) and (max-width: 1024px) {
+    /* Styles for screens between 769px and 1024px wide */
+    body {
+        /* Update styles for medium-sized screens */
+    }
+}
+
+@media screen and (min-width: 1025px) {
+    /* Styles for screens larger than 1024px wide */
+    body {
+        /* Update styles for larger screens */
+    }
+}
