@@ -1,5 +1,6 @@
 var cityInput = document.querySelector(".city-input");
 var searchButton = document.querySelector(".search-btn");
+var locationButton = document.querySelector(".location-btn");
 var currentWeatherDiv = document.querySelector(".current-weather");
 var weatherCardsDiv = document.querySelector(".weather-cards");
 
@@ -15,6 +16,7 @@ var createWeatherCard = (cityName, weatherItem, index) => {
                 <h4>Temperature: ${tempFahrenheit}°F</h4>
                 <h4>Wind: ${windSpeed} MPH</h4>
                 <h4>Humidity: ${weatherItem.main.humidity}%</h4>
+                <h4>Feels Like: ${Math.floor((weatherItem.main.feels_like - 273.15) * 9/5 + 32)}°F</h4>
             </div>
             <div class="icon">
                 <img src="http://openweathermap.org/img/wn/${weatherItem.weather[0].icon}@4x.png" alt="weather-icon">
@@ -27,6 +29,7 @@ var createWeatherCard = (cityName, weatherItem, index) => {
                 <h4>Temp: ${tempFahrenheit}°F</h4>
                 <h4>Wind: ${windSpeed} MPH</h4>
                 <h4>Humidity: ${weatherItem.main.humidity}%</h4>
+                <h4>Feels Like: ${Math.floor((weatherItem.main.feels_like - 273.15) * 9/5 + 32)}°F</h4>
             </li>`;
     }
 }
@@ -82,3 +85,27 @@ searchButton.addEventListener("click", getCityCoordinates);cityInput.addEventLis
         getCityCoordinates();
     }
 });
+
+var getUserCoordinates = () => {
+    navigator.geolocation.getCurrentPosition(
+        position => {
+            var {latitude, longitude} = position.coords;
+            var REVERSE_GEOCODING_API_URL = `http://api.openweathermap.org/geo/1.0/reverse?lat=${latitude}&lon=${longitude}&limit=1&appid=${API_KEY}`;
+
+            // Retrieves city name from coordinates using reverse geocoding API.
+            fetch(REVERSE_GEOCODING_API_URL).then(res => res.json()).then(data => {
+            var {name} = data[0];
+                getWeatherDetails(name, latitude, longitude);
+        }).catch(() => {
+            alert("Error fetching location!");
+        });
+        },
+        error => { // Alert user if location access is denied
+            if(error.code === error.PERMISSION_DENIED) 
+                alert("Please allow location access if you want more accurate weather information! Please refresh the page using 'F5' and try again");
+        }
+    );
+} 
+
+
+locationButton.addEventListener("click", getUserCoordinates);
