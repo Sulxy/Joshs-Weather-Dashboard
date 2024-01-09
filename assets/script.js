@@ -3,9 +3,8 @@ var searchButton = document.querySelector(".search-btn");
 var locationButton = document.querySelector(".location-btn");
 var currentWeatherDiv = document.querySelector(".current-weather");
 var weatherCardsDiv = document.querySelector(".weather-cards");
-
+var recentSearchesDiv = document.querySelector(".recent-search-btn");
 var API_KEY = "73576cb615d23d886fc40c208c4379e5"; // OpenWeather API Key
-
 var createWeatherCard = (cityName, weatherItem, index) => {
     var tempFahrenheit = Math.floor((weatherItem.main.temp - 273.15) * 9/5 + 32); // Convert temperature from Kelvin to Fahrenheit and remove decimal digits
     var windSpeed = Math.floor(weatherItem.wind.speed); // Drop the integers after the decimal in the wind speed
@@ -19,13 +18,13 @@ var createWeatherCard = (cityName, weatherItem, index) => {
                 <h4>Feels Like: ${Math.floor((weatherItem.main.feels_like - 273.15) * 9/5 + 32)}°F</h4>
             </div>
             <div class="icon">
-                <img src="http://openweathermap.org/img/wn/${weatherItem.weather[0].icon}@4x.png" alt="weather-icon">
+                <img src="https://openweathermap.org/img/wn/${weatherItem.weather[0].icon}@4x.png" alt="weather-icon">
                 <h4>${weatherItem.weather[0].description}</h4>  
             </div>`;
     } else { // Small weather cards
         return `<li class="card"> 
                 <h3>(${weatherItem.dt_txt.split(" ")[0]})</h3>
-                <img src="http://openweathermap.org/img/wn/${weatherItem.weather[0].icon}@2x.png" alt="weather icon">
+                <img src="https://openweathermap.org/img/wn/${weatherItem.weather[0].icon}@2x.png" alt="weather icon">
                 <h4>Temp: ${tempFahrenheit}°F</h4>
                 <h4>Wind: ${windSpeed} MPH</h4>
                 <h4>Humidity: ${weatherItem.main.humidity}%</h4>
@@ -35,7 +34,7 @@ var createWeatherCard = (cityName, weatherItem, index) => {
 }
 
 var getWeatherDetails = (cityName, lat, lon) => {
-    var WEATHER_API_URL = `http://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${API_KEY}`;
+    var WEATHER_API_URL = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${API_KEY}`;
 
     fetch(WEATHER_API_URL).then(res => res.json()).then(data => {
         // Filter the forecasts to get only one forecast per day
@@ -68,7 +67,7 @@ var getWeatherDetails = (cityName, lat, lon) => {
 var getCityCoordinates = () => {
     var cityName = cityInput.value.trim(); // Get user input city name and remove whitespace
     if(!cityName) return; // Return if cityName is empty
-    var GEOCODING_API_URL = `http://api.openweathermap.org/geo/1.0/direct?q=${cityName}&limit=1&appid=${API_KEY}`;
+    var GEOCODING_API_URL = `https://api.openweathermap.org/geo/1.0/direct?q=${cityName}&limit=1&appid=${API_KEY}`;
 
     // Fetch city coordinates from OpenWeather API
     fetch(GEOCODING_API_URL).then(res => res.json()).then(data => {
@@ -79,18 +78,71 @@ var getCityCoordinates = () => {
         alert("Error fetching weather data!");
     });
 }
+ 
 
-searchButton.addEventListener("click", getCityCoordinates);cityInput.addEventListener("keyup", function(event) {
+
+
+
+
+
+
+//  vv DOESN'T WORK
+recentSearchesDiv.addEventListener("click", (event) => {
+    var cityName = event.target.textContent;
+    var GEOCODING_API_URL = `https://api.openweathermap.org/geo/1.0/direct?q=${cityName}&limit=1&appid=${API_KEY}`;
+
+    fetch(GEOCODING_API_URL)
+        .then(res => res.json())
+        .then(data => {
+            if (!data.length) return alert("Location not found!");
+            var { name, lat, lon } = data[0];
+            getWeatherDetails(name, lat, lon);
+
+            // Update the text field of the recent search button
+            cityInput.value = cityName;
+
+            // Store the city name in recent searches in localStorage
+            var recentSearches = JSON.parse(localStorage.getItem("recentSearches")) || [];
+            recentSearches.push(cityName);
+            localStorage.setItem("recentSearches", JSON.stringify(recentSearches));
+
+            // Update the text of the recent search button
+            recentSearchesDiv.textContent = cityName;
+        })
+        .catch(() => {
+            window.alert("Error fetching weather data!");
+        });
+});
+
+searchButton.addEventListener("click", getCityCoordinates);
+cityInput.addEventListener("keyup", (event) => {
     if (event.key === "Enter") {
         getCityCoordinates();
     }
 });
 
+// Retrieve recent searches from localStorage and update the text field of the recent search button
+var recentSearches = JSON.parse(localStorage.getItem("recentSearches")) || [];
+if (recentSearches.length > 0) {
+    var mostRecentCity = recentSearches[recentSearches.length - 1];
+    cityInput.value = mostRecentCity;
+    recentSearchesDiv.textContent = mostRecentCity;
+}
+// ^^ DOESN'T WORK
+
+
+
+
+
+
+
+
+
 var getUserCoordinates = () => {
     navigator.geolocation.getCurrentPosition(
         position => {
             var {latitude, longitude} = position.coords;
-            var REVERSE_GEOCODING_API_URL = `http://api.openweathermap.org/geo/1.0/reverse?lat=${latitude}&lon=${longitude}&limit=1&appid=${API_KEY}`;
+            var REVERSE_GEOCODING_API_URL = `https://api.openweathermap.org/geo/1.0/reverse?lat=${latitude}&lon=${longitude}&limit=1&appid=${API_KEY}`;
 
             // Retrieves city name from coordinates using reverse geocoding API.
             fetch(REVERSE_GEOCODING_API_URL).then(res => res.json()).then(data => {
@@ -106,6 +158,5 @@ var getUserCoordinates = () => {
         }
     );
 } 
-
 
 locationButton.addEventListener("click", getUserCoordinates);

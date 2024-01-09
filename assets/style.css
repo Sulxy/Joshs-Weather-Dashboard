@@ -135,6 +135,44 @@ h1 {
     margin: 5px 0 -12px 0;
 }
 
+.recent-searches-seperator {
+    height: 1px;
+    width: 100%;
+    margin: 25px 0;
+    background: #bbb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.recent-searches-seperator::before {
+    content: "or";
+    color: #6C757D;
+    font-size: 1.18rem;
+    padding: 0 15px;
+    margin-top: -4px;
+    background: #E3F2FD;
+}
+
+.recent-search-buttons .search-buttons{
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    
+    padding: 5px;
+}
+
+.weather-input .recent-search-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.weather-input .recent-search-buttons .search-buttons {
+    padding: 5px;
+}
+
 @media (max-width: 1400px) {
     .weather-data .current-weather {
         padding: 20px;
