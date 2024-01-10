@@ -4,6 +4,7 @@ var locationButton = document.querySelector(".location-btn");
 var currentWeatherDiv = document.querySelector(".current-weather");
 var weatherCardsDiv = document.querySelector(".weather-cards");
 var recentSearchesDiv = document.querySelector(".recent-search-btn");
+var recentSearchButtonsDiv = document.querySelector(".recent-search-buttons");
 var API_KEY = "73576cb615d23d886fc40c208c4379e5"; // OpenWeather API Key
 var createWeatherCard = (cityName, weatherItem, index) => {
     var tempFahrenheit = Math.floor((weatherItem.main.temp - 273.15) * 9/5 + 32); // Convert temperature from Kelvin to Fahrenheit and remove decimal digits
@@ -64,8 +65,8 @@ var getWeatherDetails = (cityName, lat, lon) => {
     });
 }
 
-var getCityCoordinates = () => {
-    var cityName = cityInput.value.trim(); // Get user input city name and remove whitespace
+var getCityCoordinates = (cityName) => {
+    cityName = cityName.trim(); // Get user input city name and remove whitespace
     if(!cityName) return; // Return if cityName is empty
     var GEOCODING_API_URL = `https://api.openweathermap.org/geo/1.0/direct?q=${cityName}&limit=1&appid=${API_KEY}`;
 
@@ -79,65 +80,6 @@ var getCityCoordinates = () => {
     });
 }
  
-
-
-
-
-
-
-
-//  vv DOESN'T WORK
-recentSearchesDiv.addEventListener("click", (event) => {
-    var cityName = event.target.textContent;
-    var GEOCODING_API_URL = `https://api.openweathermap.org/geo/1.0/direct?q=${cityName}&limit=1&appid=${API_KEY}`;
-
-    fetch(GEOCODING_API_URL)
-        .then(res => res.json())
-        .then(data => {
-            if (!data.length) return alert("Location not found!");
-            var { name, lat, lon } = data[0];
-            getWeatherDetails(name, lat, lon);
-
-            // Update the text field of the recent search button
-            cityInput.value = cityName;
-
-            // Store the city name in recent searches in localStorage
-            var recentSearches = JSON.parse(localStorage.getItem("recentSearches")) || [];
-            recentSearches.push(cityName);
-            localStorage.setItem("recentSearches", JSON.stringify(recentSearches));
-
-            // Update the text of the recent search button
-            recentSearchesDiv.textContent = cityName;
-        })
-        .catch(() => {
-            window.alert("Error fetching weather data!");
-        });
-});
-
-searchButton.addEventListener("click", getCityCoordinates);
-cityInput.addEventListener("keyup", (event) => {
-    if (event.key === "Enter") {
-        getCityCoordinates();
-    }
-});
-
-// Retrieve recent searches from localStorage and update the text field of the recent search button
-var recentSearches = JSON.parse(localStorage.getItem("recentSearches")) || [];
-if (recentSearches.length > 0) {
-    var mostRecentCity = recentSearches[recentSearches.length - 1];
-    cityInput.value = mostRecentCity;
-    recentSearchesDiv.textContent = mostRecentCity;
-}
-// ^^ DOESN'T WORK
-
-
-
-
-
-
-
-
-
 var getUserCoordinates = () => {
     navigator.geolocation.getCurrentPosition(
         position => {
@@ -159,4 +101,44 @@ var getUserCoordinates = () => {
     );
 } 
 
+// When the Search button is clicked, get the city coordinates and display the weather details
+searchButton.addEventListener("click", getCityCoordinates);
+
+// When the Use Current Location button is clicked, get the user coordinates and display the weather details
 locationButton.addEventListener("click", getUserCoordinates);
+
+// When the Search button is clicked, get the city coordinates and display the weather details
+searchButton.addEventListener("click", function() {
+    var cityName = cityInput.value;
+    updateRecentSearchButtons(cityName);
+    getCityCoordinates(cityName);
+});
+
+var updateRecentSearchButtons = (cityName) => {
+    var button = document.createElement("button");
+    button.textContent = cityName;
+    button.addEventListener("click", function() {
+        getCityCoordinates(cityName);
+    });
+    recentSearchButtonsDiv.appendChild(button);
+};
+
+// When the created button is clicked, run the getCityCoordinates function
+recentSearchButtonsDiv.addEventListener("click", function(event) {
+    if (event.target.tagName === "BUTTON") {
+        var cityName = event.target.textContent;
+        getCityCoordinates(cityName);
+    }
+});
+
+
+
+
+
+
+
+
+
+
+
+
