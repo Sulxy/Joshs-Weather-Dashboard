@@ -6,6 +6,8 @@ var weatherCardsDiv = document.querySelector(".weather-cards");
 var recentSearchesDiv = document.querySelector(".recent-search-btn");
 var recentSearchButtonsDiv = document.querySelector(".recent-search-buttons");
 var API_KEY = "73576cb615d23d886fc40c208c4379e5"; // OpenWeather API Key
+
+// Creates a weather card with the weather details
 var createWeatherCard = (cityName, weatherItem, index) => {
     var tempFahrenheit = Math.floor((weatherItem.main.temp - 273.15) * 9/5 + 32); // Convert temperature from Kelvin to Fahrenheit and remove decimal digits
     var windSpeed = Math.floor(weatherItem.wind.speed); // Drop the integers after the decimal in the wind speed
@@ -34,6 +36,7 @@ var createWeatherCard = (cityName, weatherItem, index) => {
     }
 }
 
+// Get weather details from OpenWeather API
 var getWeatherDetails = (cityName, lat, lon) => {
     var WEATHER_API_URL = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${API_KEY}`;
 
@@ -61,25 +64,28 @@ var getWeatherDetails = (cityName, lat, lon) => {
             }
         });
     }).catch(() => {
-        alert("Error occured while fetching the weather forecast!");
+        alert("Error occured while fetching the weather forecast!"); // Alert user if error occurs while fetching weather data
     });
 }
 
+// Get city coordinates from OpenWeather API
 var getCityCoordinates = (cityName) => {
+    if (typeof cityName !== 'string') return; // Return if cityName is not a string
     cityName = cityName.trim(); // Get user input city name and remove whitespace
-    if(!cityName) return; // Return if cityName is empty
+    if (!cityName) return; // Return if cityName is empty
     var GEOCODING_API_URL = `https://api.openweathermap.org/geo/1.0/direct?q=${cityName}&limit=1&appid=${API_KEY}`;
 
     // Fetch city coordinates from OpenWeather API
     fetch(GEOCODING_API_URL).then(res => res.json()).then(data => {
-        if(!data.length) return alert("Location not found!");
-        var {name, lat, lon} = data[0];
+        if (!data.length) return alert("Location not found!");
+        var { name, lat, lon } = data[0];
         getWeatherDetails(name, lat, lon);
     }).catch(() => {
-        alert("Error fetching weather data!");
+        alert("Error fetching weather data!"); // Alert user if error occurs while fetching weather data
     });
 }
  
+// Get user coordinates from browser
 var getUserCoordinates = () => {
     navigator.geolocation.getCurrentPosition(
         position => {
@@ -114,6 +120,7 @@ searchButton.addEventListener("click", function() {
     getCityCoordinates(cityName);
 });
 
+// Creates a button with the cityName as its text content and adds an event listener
 var updateRecentSearchButtons = (cityName) => {
     var button = document.createElement("button");
     button.textContent = cityName;
@@ -130,15 +137,3 @@ recentSearchButtonsDiv.addEventListener("click", function(event) {
         getCityCoordinates(cityName);
     }
 });
-
-
-
-
-
-
-
-
-
-
-
-
