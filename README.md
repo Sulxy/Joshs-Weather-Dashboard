@@ -21,5 +21,5 @@ Weather Results displayed: City, Date (YYYY-MM-DD), Temperature, Wind, Humidity,
 https://sulxy.github.io/Joshs-Weather-Dashboard/
 
 ## Credits/Sources
-Thank you to CodingNepal on YouTube for providing an excellent video on this topic; their code is mimic'd but copied, and additional functionality has been added.
+Thank you to CodingNepal on YouTube for providing an excellent video on this topic; their code is mimic'd but not outright copied, and additional functionality has been added by myself.
 Also thank you to Angela and Gabe; who authored no code, but offered assistance and feedback when I needed it. 
